@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import withReducer from "app/store/withReducer";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllComercios } from "../store/actions/comercios.actions";
+import {
+  getAllComercios,
+  deleteComercio,
+} from "../store/actions/comercios.actions";
 import reducer from "../store/reducers";
 import {
   Paper,
@@ -15,6 +18,11 @@ import {
   Button,
   IconButton,
   Icon,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useHistory } from "react-router-dom";
@@ -41,6 +49,8 @@ function TableComercios() {
   const classes = useStyles();
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [open, setOpen] = React.useState(false);
+  const [comercioSelected, setComercioSelected] = React.useState(null);
 
   const comercios = useSelector(
     ({ comercioReducer }) => comercioReducer.comercioReducer.comercios
@@ -60,6 +70,20 @@ function TableComercios() {
 
   const sendToEdit = (item) => {
     history.push("/comercio/editar/" + item.id);
+  };
+
+  const handleClickOpen = (item) => {
+    setComercioSelected(item);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleDelete = () => {
+    dispatch(deleteComercio(comercioSelected.id));
+    setOpen(false);
   };
 
   return (
@@ -116,6 +140,7 @@ function TableComercios() {
                   </Box>
                 </TableCell>
                 <TableCell align="center"></TableCell>
+                <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -151,6 +176,11 @@ function TableComercios() {
                             <Icon>edit</Icon>
                           </IconButton>
                         </TableCell>
+                        <TableCell component="th" scope="row" align="center">
+                          <IconButton onClick={() => handleClickOpen(row)}>
+                            <Icon color="error">delete</Icon>
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -172,6 +202,31 @@ function TableComercios() {
           />
         </Paper>
       </div>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Eliminar comercio</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Esta acción es irreversible, el comercio se eliminara.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleDelete}
+            style={{ backgroundColor: "red", color: "white" }}
+            autoFocus
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

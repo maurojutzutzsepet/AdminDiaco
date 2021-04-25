@@ -8,7 +8,7 @@ import { Button, InputAdornment, Icon } from "@material-ui/core";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import { useDispatch, useSelector } from "react-redux";
-import { loginDiaco } from "app/diaco/store/actions";
+import { loginDiaco } from "app/loggin-module/store/actions";
 import withReducer from "app/store/withReducer";
 import reducer from "../../store/reducers/login.reducer";
 import { useHistory } from "react-router-dom";

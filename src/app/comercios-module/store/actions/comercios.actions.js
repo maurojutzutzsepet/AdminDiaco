@@ -4,6 +4,7 @@ import Axios from "axios";
 export const GET_ALL_COMERCIOS = "GET_ALL_COMERCIOS";
 export const CHANGE_KEY_COMERCIO = "CHANGE_KEY_COMERCIO";
 export const SET_COMERCIO = "SET_COMERCIO";
+export const DELETE_COMERCIO = "DELETE_COMERCIO";
 export const CLEAR_COMERCIO = "CLEAR_COMERCIO";
 
 export function getAllComercios() {
@@ -74,6 +75,33 @@ export function getComercio(id) {
         type: SET_COMERCIO,
         payload: { comercio: res.data },
       });
+    } catch (error) {
+      dispatch(
+        showMessage({
+          message: "Ocurrió un problema",
+          variant: "error",
+        })
+      );
+    }
+  };
+}
+
+export function deleteComercio(id) {
+  const url = `https://maurojutzutzgt.herokuapp.com/api/comercio/${id}`;
+  return async (dispatch) => {
+    try {
+      await Axios.delete(url);
+
+      dispatch({
+        type: DELETE_COMERCIO,
+        payload: { idComercio: id },
+      });
+      dispatch(
+        showMessage({
+          message: "Se elimino el comercio",
+          variant: "success",
+        })
+      );
     } catch (error) {
       dispatch(
         showMessage({

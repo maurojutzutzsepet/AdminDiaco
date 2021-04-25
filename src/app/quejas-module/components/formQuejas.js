@@ -4,6 +4,11 @@ import Paper from "@material-ui/core/Paper";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Icon,
   IconButton,
   Table,
@@ -16,7 +21,7 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllQuejas } from "../store/actions";
+import { getAllQuejas, deleteQueja } from "../store/actions";
 import { useLocalStorage } from "@fuse/hooks";
 import reducer from "../store/reducers";
 import withReducer from "app/store/withReducer";
@@ -52,15 +57,30 @@ function FormQuejas() {
   const [userInfo] = useLocalStorage("infoUser", "");
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [page, setPage] = React.useState(0);
+  const [open, setOpen] = React.useState(false);
+  const [quejaSelected, setQuejaSelected] = React.useState(null);
   const classes = useStyles();
   const quejas = useSelector(
     ({ quejaReducerList }) => quejaReducerList.reducerQueja.quejas
   );
-  //console.log("state", quejas);
 
   useEffect(() => {
     dispatch(getAllQuejas(userInfo.cui));
   }, [dispatch, userInfo.cui]);
+
+  const handleClickOpen = (item) => {
+    setQuejaSelected(item);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleDelete = () => {
+    dispatch(deleteQueja(quejaSelected.id));
+    setOpen(false);
+  };
 
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(event.target.value);
@@ -129,6 +149,7 @@ function FormQuejas() {
                   </Box>
                 </TableCell>
                 <TableCell align="center"></TableCell>
+                <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -164,6 +185,11 @@ function FormQuejas() {
                             <Icon>edit</Icon>
                           </IconButton>
                         </TableCell>
+                        <TableCell component="th" scope="row" align="center">
+                          <IconButton onClick={() => handleClickOpen(row)}>
+                            <Icon color="error">delete</Icon>
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -185,9 +211,31 @@ function FormQuejas() {
           />
         </Paper>
       </div>
-      {/* <TabPanel value={value} index={0}>
-        Item One
-      </TabPanel> */}
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Eliminar queja</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Esta acción es irreversible, la queja se eliminara.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleDelete}
+            style={{ backgroundColor: "red", color: "white" }}
+            autoFocus
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

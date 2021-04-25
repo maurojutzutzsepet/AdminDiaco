@@ -1,7 +1,17 @@
 import React, { useEffect } from "react";
 import Formsy from "formsy-react";
 import { Button } from "@material-ui/core";
-import { Grid, Paper, Box, makeStyles } from "@material-ui/core";
+import {
+  Grid,
+  Paper,
+  Box,
+  makeStyles,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@material-ui/core";
 import TextMultiline from "@fuse/components/FomBase/TextMultiline";
 import { useLocalStorage } from "@fuse/hooks";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,12 +19,19 @@ import {
   changeKeyQueja,
   clearQueja,
   createQueja,
+  getComercio,
   getQueja,
   updateQueja,
 } from "../store/actions";
 import withReducer from "app/store/withReducer";
 import reducer from "../store/reducers";
 import { useParams } from "react-router";
+import { findByCatalog } from "app/utils/findByCatalogo";
+import {
+  catalogDepartameto,
+  catalogMunicipio,
+  catalogRegion,
+} from "app/utils/constanst";
 
 const useStyles = makeStyles((theme) => ({
   paperForm: {
@@ -48,6 +65,8 @@ function CrearQueja() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { idQueja } = useParams();
+  //const history = useHistory();
+  const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
     if (idQueja) {
@@ -64,12 +83,18 @@ function CrearQueja() {
     ({ quejaReducer }) => quejaReducer.reducerQueja.formatedQueja
   );
 
+  const comercio = useSelector(
+    ({ quejaReducer }) => quejaReducer.reducerQueja.comercio
+  );
+
   const handleSubmit = () => {
     if (idQueja) {
       dispatch(updateQueja(idQueja, formatedQueja));
     } else {
       dispatch(createQueja({ ...formatedQueja, user: userInfo.cui }));
     }
+    setOpen(false);
+    //history.push("/quejas");
   };
 
   const changeKey = (event) => {
@@ -78,6 +103,16 @@ function CrearQueja() {
     };
 
     dispatch(changeKeyQueja(data));
+  };
+
+  const handleClickOpen = (item) => {
+    //setQuejaSelected(item);
+    dispatch(getComercio(formatedQueja.nit));
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   //   function enableButton() {
@@ -148,16 +183,69 @@ function CrearQueja() {
         </Paper>
         <Button
           //className="mt-32 lg:mx-48 md:mx-16 sm:mx-48 rounded-full"
-          type="submit"
+          //type="submit"
+          onClick={handleClickOpen}
           variant="contained"
           color="primary"
           aria-label="LOG IN"
           //disabled={!isFormValid}
           value="legacy"
         >
-          AGREGAR
+          {idQueja ? "EDITAR" : "AGREGAR"}
         </Button>
       </Formsy>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {idQueja ? "Editar queja" : "Agregar queja"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {comercio ? (
+              <>
+                Se adjuntara la queja al siguiente comercio:
+                <br />
+                <b> Nombre comercio:</b> {comercio.nombre_comercio}
+                <br />
+                <b>Nit comercio:</b> {comercio.nit}
+                <br />
+                <b>Dirección:</b> {comercio.direccion}
+                <br />
+                <b>Municipio:</b>{" "}
+                {findByCatalog(comercio.municipio, catalogMunicipio)}
+                <br />
+                <b>Departamento:</b>
+                {findByCatalog(comercio.departamento, catalogDepartameto)}
+                <br />
+                <b>Region:</b> {findByCatalog(comercio.region, catalogRegion)}
+              </>
+            ) : (
+              <>
+                Cargando...
+                <br />
+                Asegurese de ingresar bien el nit del comercio
+              </>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            color="primary"
+            variant="contained"
+            autoFocus
+          >
+            {idQueja ? "Editar queja" : "Agregar queja"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

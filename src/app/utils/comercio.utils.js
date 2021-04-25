@@ -10,3 +10,14 @@ export const comercioInterface = (data = {}) => {
     direccion: data.direccion || "",
   };
 };
+
+export const comercioDeleted = (idComercio, stateComercio = []) => {
+  let newComercio = [];
+  stateComercio.map((e) => {
+    if (e.id !== idComercio) {
+      newComercio.push(e);
+    }
+    return null;
+  });
+  return newComercio;
+};

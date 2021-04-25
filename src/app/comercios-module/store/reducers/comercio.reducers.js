@@ -1,4 +1,4 @@
-import { comercioInterface } from "app/utils/comercio.utils";
+import { comercioInterface, comercioDeleted } from "app/utils/comercio.utils";
 import * as Actions from "../actions";
 const initialState = {
   comercios: [],
@@ -19,6 +19,13 @@ const comercioReducer = function (state = initialState, action) {
           ...state.formatedComercio,
           ...action.payload,
         }),
+      };
+    }
+    case Actions.DELETE_COMERCIO: {
+      const { idComercio } = action.payload;
+      return {
+        ...state,
+        comercios: comercioDeleted(idComercio, state.comercios),
       };
     }
     case Actions.CLEAR_COMERCIO: {

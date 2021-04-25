@@ -8,7 +8,7 @@ import { Button, InputAdornment, Icon } from "@material-ui/core";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import { useDispatch } from "react-redux";
-import { signupDiaco } from "app/diaco/store/actions";
+import { signupDiaco } from "app/loggin-module/store/actions";
 
 const useStyles = makeStyles((theme) => ({
   iconCLose: {
